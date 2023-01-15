@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TODO-LIST</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/mystyle.css">
+</head>
+<body>
+    <div style="margin-top: 50px;">
+        <b>TO-DO LIST</b>
+        <br>
+        <a>点击任务标题编辑，按下回车完成编辑。</a>
+        <br>
+        <br>
+        <input id="task_input" class="headinput" placeholder="请输入任务内容"/>
+        <span id="task_add_btn" class="headbtn">添加</span>
+    </div>
+    <div id="task_container" style="margin-top: 50px;">
+        <!--TODO内容将被展示在此处--> 
+    </div>
+</body>
+<script type="text/javascript">
+    var container = document.getElementById("task_container"),
+        input = document.getElementById("task_input");
+
+    Vue.component('todo',{
+        template: 
+        '<div :class="todo_class">' +
+        '   <img alt="完成任务" src="img\\check-mark.png" class="checkbtn" @click="finish_task"/>' +
+        '   <a :class="content_class" style="width: calc(100% - 40px);" v-show="!input_visibility" @click="show_input">{{task_content}}</a>' +
+        '   <input class="taskinput" v-model="input_content" v-show="input_visibility" @keypress="hide_input"/>' +
+        '   <img alt="删除任务" src="img\\delete.png" class="deletebtn" @click="delete_task"/>' +
+        '</div>',
+        data: function(){
+            return {
+                task_content: input.value,
+                input_content: '',
+                content_class: '',
+                todo_class: 'todo',
+                done: false,
+                input_visibility: false
+            }
+        },
+        methods:{
+            hide_input: function(e){
+                if (e.keyCode == 13){
+                    console.log(this.input_content);
+                    this.input_visibility = false;
+                    this.task_content = this.input_content;
+                }  
+            },
+            show_input: function(){
+                this.input_content = this.task_content;
+                this.input_visibility = true;
+            },
+            finish_task: function(){
+                if (!this.done){
+                    this.content_class = "task_finished";
+                    this.todo_class = "todo_finished"
+                }
+                else
+                {
+                    this.content_class = "task";
+                    this.todo_class = "todo"
+                }
+                this.done = !this.done;
+            },
+            delete_task: function(){
+                this.$destroy();
+                this.$el.parentNode.removeChild(this.$el);
+            }
+        }
+    })
+
+    function task_add(){
+        var todo = document.createElement("todo");
+        container.appendChild(todo);
+        new Vue({ el: todo });
+        input.value = "";
+    }
+    document.getElementById("task_add_btn").addEventListener("click", task_add);
+</script>
+</html>
